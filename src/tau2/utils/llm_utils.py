@@ -19,6 +19,7 @@ from tau2.config import (
     REDIS_PORT,
     REDIS_PREFIX,
     USE_LANGFUSE,
+    USE_MLFLOW,
 )
 from tau2.data_model.message import (
     AssistantMessage,
@@ -36,6 +37,10 @@ if USE_LANGFUSE:
     # set callbacks
     litellm.success_callback = ["langfuse"]
     litellm.failure_callback = ["langfuse"]
+
+if USE_MLFLOW:
+    import mlflow
+    mlflow.autolog()
 
 litellm.drop_params = True
 

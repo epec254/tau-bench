@@ -40,6 +40,6 @@ REDIS_CACHE_TTL = 60 * 60 * 24 * 30
 
 # LANGFUSE
 USE_LANGFUSE = False  # If True, make sure all the env variables are set for langfuse.
-
+USE_MLFLOW = True  # If True, make sure all the env variables are set for mlflow.
 # API
 API_PORT = 8000
