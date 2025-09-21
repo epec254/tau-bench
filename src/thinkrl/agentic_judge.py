@@ -130,6 +130,7 @@ def judge_rollout(rollout: Dict[str, Any], policy: str, judge):
 def main():
     parser = argparse.ArgumentParser(description='Judge LLM agent performance in simulation data')
     parser.add_argument('input_file', help='Input JSON file path containing simulation data')
+    parser.add_argument('--max-simulations', type=int, help='Maximum number of simulations to process (default: process all)')
 
     args = parser.parse_args()
 
@@ -140,8 +141,14 @@ def main():
     # Load simulations
     simulations, policy, raw_data = load_simulations(args.input_file)
 
+    # Limit simulations if max_simulations is specified
+    simulations_to_process = simulations[:args.max_simulations] if args.max_simulations else simulations
+    total_simulations = len(simulations_to_process)
+
+    print(f"Processing {total_simulations} of {len(simulations)} simulations")
+
     # Process each simulation
-    for i, rollout in enumerate(simulations):
+    for i, rollout in enumerate(simulations_to_process):
         result = judge_rollout(rollout=rollout, policy=policy, judge=telecom_judge)
 
         # Add judgment to the simulation in raw_data
@@ -153,7 +160,7 @@ def main():
             "timestamp": datetime.now().isoformat()
         }
 
-        print(f"Simulation {i+1}/{len(simulations)}: {result['verdict']}")
+        print(f"Simulation {i+1}/{total_simulations}: {result['verdict']}")
 
     # Save updated data to new file
     output_file = args.input_file.replace(".json", "_with_judgments.json")
