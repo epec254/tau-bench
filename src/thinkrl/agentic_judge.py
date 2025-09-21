@@ -12,6 +12,7 @@ import dspy
 import dotenv
 import mlflow
 from datetime import datetime
+import argparse
 
 from thinkrl.utils.tracing import enable_tracing
 
@@ -110,7 +111,7 @@ def load_simulations(file_path: str) -> Tuple[str, list[Dict[str, Any]]]:
     return simulations, policy, simulations_raw_data
 
 
-def judge_rollout(rollout: Dict[str, Any], policy: str):
+def judge_rollout(rollout: Dict[str, Any], policy: str, judge):
 
     with mlflow.start_span() as span:
         span.set_inputs({"rollout": rollout, "policy": policy})
@@ -119,26 +120,29 @@ def judge_rollout(rollout: Dict[str, Any], policy: str):
         if not messages_str:
             raise ValueError(f"Messages field is missing or empty in the rollout: {rollout}")
 
-        result = telecom_judge(messages=messages_str, policy=policy)
+        result = judge(messages=messages_str, policy=policy)
         span.set_outputs(result.toDict())
 
     return result.toDict()
 
 
 
-# Example usage
-if __name__ == "__main__":
-    # Example configuration
+def main():
+    parser = argparse.ArgumentParser(description='Judge LLM agent performance in simulation data')
+    parser.add_argument('input_file', help='Input JSON file path containing simulation data')
 
+    args = parser.parse_args()
+
+    # Configure DSPy
     dspy.configure(lm=dspy.LM(JUDGE_MODEL, temperature=1.0, max_tokens=20000))
-
     telecom_judge = dspy.ChainOfThought(AgenticJudgeSignature)
 
-    simulations, policy, raw_data = load_simulations("data/simulations/2025-09-21T13:52:54.208346_telecom_llm_agent_gpt-5_user_simulator_gpt-5_rollouts_only.json")
+    # Load simulations
+    simulations, policy, raw_data = load_simulations(args.input_file)
 
-
+    # Process each simulation
     for i, rollout in enumerate(simulations):
-        result = judge_rollout(rollout=rollout, policy=policy)
+        result = judge_rollout(rollout=rollout, policy=policy, judge=telecom_judge)
 
         # Add judgment to the simulation in raw_data
         raw_data["simulations"][i]["judgment"] = {
@@ -149,13 +153,16 @@ if __name__ == "__main__":
             "timestamp": datetime.now().isoformat()
         }
 
-        # print(result)
+        print(f"Simulation {i+1}/{len(simulations)}: {result['verdict']}")
 
     # Save updated data to new file
-    input_file = "data/simulations/2025-09-21T13:52:54.208346_telecom_llm_agent_gpt-5_user_simulator_gpt-5_rollouts_only.json"
-    output_file = input_file.replace(".json", "_with_judgments.json")
+    output_file = args.input_file.replace(".json", "_with_judgments.json")
 
     with open(output_file, 'w') as f:
         json.dump(raw_data, f, indent=2)
 
     print(f"Saved judgments to: {output_file}")
+
+
+if __name__ == "__main__":
+    main()
