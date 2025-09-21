@@ -11,6 +11,7 @@ import json
 import dspy
 import dotenv
 import mlflow
+from datetime import datetime
 
 from thinkrl.utils.tracing import enable_tracing
 
@@ -136,7 +137,25 @@ if __name__ == "__main__":
     simulations, policy, raw_data = load_simulations("data/simulations/2025-09-21T13:52:54.208346_telecom_llm_agent_gpt-5_user_simulator_gpt-5_rollouts_only.json")
 
 
-    for rollout in simulations:
+    for i, rollout in enumerate(simulations):
         result = judge_rollout(rollout=rollout, policy=policy)
-        
-        print(result)
+
+        # Add judgment to the simulation in raw_data
+        raw_data["simulations"][i]["judgment"] = {
+            "verdict": result["verdict"],
+            "debug_info": result["debug_info"],
+            "reasoning": result["reasoning"],
+            "judge_model": JUDGE_MODEL,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        # print(result)
+
+    # Save updated data to new file
+    input_file = "data/simulations/2025-09-21T13:52:54.208346_telecom_llm_agent_gpt-5_user_simulator_gpt-5_rollouts_only.json"
+    output_file = input_file.replace(".json", "_with_judgments.json")
+
+    with open(output_file, 'w') as f:
+        json.dump(raw_data, f, indent=2)
+
+    print(f"Saved judgments to: {output_file}")
