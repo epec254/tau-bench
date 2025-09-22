@@ -49,6 +49,10 @@ class SimulationOutput(BaseModel):
         description="The LLM judge evaluation of this simulation run",
         default=None
     )
+    is_reviewed: Optional[bool] = Field(
+        description="Whether this simulation has been reviewed by the agent RL",
+        default=False
+    )
 
 class FilteredSimulationRuns(BaseModel):
     """Filtered simulation results that may include judgments."""
