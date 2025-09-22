@@ -10,6 +10,42 @@ import argparse
 from pathlib import Path
 
 
+def filter_user_tool_calls(messages):
+    """
+    Filter out user tool calls and their corresponding tool responses.
+
+    Args:
+        messages: List of message dictionaries
+
+    Returns:
+        List of filtered messages without user tool calls and tool responses
+    """
+    # Collect tool call IDs from user messages with tool calls
+    tool_call_ids = set()
+    for message in messages:
+        if (message.get('role') == 'user' and
+            message.get('tool_calls') is not None):
+            for tool_call in message.get('tool_calls', []):
+                tool_call_ids.add(tool_call.get('id'))
+
+    # Filter out user tool calls and tool responses
+    filtered_messages = []
+    for message in messages:
+        # Skip user messages with tool calls
+        if (message.get('role') == 'user' and
+            message.get('tool_calls') is not None):
+            continue
+
+        # Skip tool responses matching collected IDs
+        if (message.get('role') == 'tool' and
+            message.get('id') in tool_call_ids):
+            continue
+
+        filtered_messages.append(message)
+
+    return filtered_messages
+
+
 def extract_simulations(input_file: str, output_file: str = None):
     """
     Extract simulations from input JSON file and create filtered JSON output.
@@ -49,7 +85,7 @@ def extract_simulations(input_file: str, output_file: str = None):
                 'start_time': simulation.get('start_time'),
                 'end_time': simulation.get('end_time'),
                 'duration': simulation.get('duration'),
-                'messages': simulation.get('messages', [])
+                'messages': filter_user_tool_calls(simulation.get('messages', []))
             }
             output_data['simulations'].append(filtered_sim)
 

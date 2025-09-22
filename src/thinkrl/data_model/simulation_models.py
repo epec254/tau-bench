@@ -43,7 +43,7 @@ class SimulationOutput(BaseModel):
     end_time: str = Field(description="The end time of the simulation.")
     duration: float = Field(description="The duration of the simulation.")
     messages: list[Message] = Field(
-        description="The messages exchanged between the user, agent and environment."
+        description="The messages exchanged between the user and agent along with the tool calls made by the agent."
     )
     judgment: Optional[Judgment] = Field(
         description="The LLM judge evaluation of this simulation run",
