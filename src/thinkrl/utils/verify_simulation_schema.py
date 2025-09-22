@@ -11,7 +11,7 @@ from pydantic import ValidationError
 # Add the src directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from thinkrl.simulation_models import FilteredSimulationRuns
+from thinkrl.data_model.simulation_models import FilteredSimulationRuns
 
 
 def verify_simulation_schema(json_file_path: str) -> bool:
