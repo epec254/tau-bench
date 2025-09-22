@@ -41,6 +41,11 @@ def filter_user_tool_calls(messages):
             message.get('id') in tool_call_ids):
             continue
 
+        # Skip tool messages with requestor="user" (backup filter)
+        if (message.get('role') == 'tool' and
+            message.get('requestor') == 'user'):
+            continue
+
         filtered_messages.append(message)
 
     return filtered_messages
