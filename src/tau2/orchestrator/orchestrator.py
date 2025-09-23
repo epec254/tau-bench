@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any, Optional
 
 from loguru import logger
-import mlflow
+# import mlflow
 
 from tau2.agent.base import BaseAgent, is_valid_agent_history_message
 from tau2.agent.llm_agent import LLMSoloAgent
@@ -250,7 +250,7 @@ class Orchestrator:
             SimulationRun: The simulation run.
         """
         # with mlflow.start_span() as sim_span:
-        sim_span.set_inputs({"task_id": self.task.id, "task_name": self.task.name})
+        # sim_span.set_inputs({"task_id": self.task.id, "task_name": self.task.name})
         start_time = get_now()
         start = time.perf_counter()
         self.initialize()
