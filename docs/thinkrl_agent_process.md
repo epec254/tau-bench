@@ -1,4 +1,13 @@
 
+## DONE MAUNALLY:
+
+Run the sim
+
+`tau2 run --domain telecom-workflow --agent-llm "openrouter/openai/gpt-5-nano" --user-llm "openrouter/openai/gpt-5" --max-concurrency 20`
+
+tau2 run --domain telecom-workflow --agent-llm "openrouter/openai/gpt-5-nano" --user-llm "openrouter/openai/gpt-5" --max-concurrency 20 --save-to "data/simulations/2025-09-22T12:25:10.256274_telecom-workflow_llm_agent_gpt-5-nano_user_simulator_gpt-5.json"
+
+
 ## DONE MANUALLY:
 
 
@@ -6,6 +15,11 @@ CODE BASED CONTROL LOOP:
 * Run judge for each trace that generates a pass/fail + root cause
 
 Run this: `python src/thinkrl/utils/extract_simulations.py data/thinkrl/2025-09-21T19:10:46.051490_telecom_llm_agent_gpt-5-nano_user_simulator_gpt-5.json`
+
+`python src/thinkrl/agentic_judge.py data/thinkrl/2025-09-22T12:25:10.256274_telecom-workflow_llm_agent_gpt-5-nano_user_simulator_gpt-5_rollouts_only.json --max-workers 10`
+
+
+python src/thinkrl/agentic_judge.py data/thinkrl/2025-09-22T12:25:10.256274_telecom-workflow_llm_agent_gpt-5-nano_user_simulator_gpt-5.json --max-simulations 8
 
 Run this: 
 
