@@ -41,6 +41,7 @@ dependencies = [
     "langfuse>=2.60.7",
     "dspy-ai>=2.5.0",
     "mlflow>=3.4.0",
+    "ipykernel>=6.30.1",
 ]
 [project.scripts]
 tau2 = "tau2.cli:main"
